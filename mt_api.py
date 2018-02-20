@@ -28,6 +28,9 @@ app.config.from_object(__name__)
 app.config.from_envvar('MINITWIT_SETTINGS', silent=True)
 basic_auth = Subclass(app)
 
+@app.errorhandler(404)
+def page_not_found(error):
+    return jsonify(error=404, text=str(error)), 404
 
 @app.teardown_appcontext
 def close_database(exception):
@@ -95,7 +98,7 @@ def public_timeline():
         order by message.pub_date desc limit ?''', [PER_PAGE])
     response = [dict(x) for x in response]
     response = jsonify(response)
-    response.status_code = 200
+    response.error = 200
     return response
 
 @app.route('/users', methods=['POST'])
@@ -120,12 +123,9 @@ def users():
            generate_password_hash(request.json['password'])])
         db.commit()
         response = jsonify(url_for('users') + '/' + request.json['username'])
-        response.status_code = 201
+        response.error = 201
         return response
-    response = jsonify(response)
-    response.status_code = 400
-    response.error = error
-    return response
+    return jsonify(error=400), 400
 
 
 @app.route('/users/<username>/followers', methods=['POST', 'DELETE'])
@@ -136,27 +136,27 @@ def followers(username):
         who_id = get_user_id(request.authorization.username)
         whom_id = get_user_id(username)
         if who_id is None or whom_id is None:
-            abort(400)
+            return jsonify(error=400), 400
         db = get_db()
         # Uses username/id because form provided id, but rest api username
         db.execute('insert into follower (who_id, whom_id) values (?, ?)',
                   [who_id, whom_id])
         db.commit()
         response = jsonify(url_for('timeline', username=username))
-        response.status_code = 201
+        response.error = 201
         return response
     else:
         who_id = get_user_id(request.authorization.username)
         whom_id = get_user_id(username)
         if who_id is None or whom_id is None:
-            abort(400)
+            return jsonify(error=400), 400
         db = get_db()
         # Uses username/id because form provided id, but rest api username
         db.execute('delete from follower where who_id=? and whom_id=?',
                   [who_id, whom_id])
         db.commit()
         response = jsonify(url_for('timeline', username=username))
-        response.status_code = 200
+        response.error = 200
         return response
 
 
@@ -174,7 +174,7 @@ def timeline(username):
         [get_user_id(username), get_user_id(username), PER_PAGE])
     response = [dict(x) for x in response]
     response = jsonify(response)
-    response.status_code = 200
+    response.error = 200
     return response
 
 
@@ -184,7 +184,7 @@ def user_tweets(username):
     profile_user = query_db('select * from user where username = ?',
                             [username], one=True)
     if profile_user is None:
-        abort(404)
+        return jsonify(error=404), 404
     response =  query_db('''
             select message.*, user.* from message, user where
             user.user_id = message.author_id and user.user_id = ?
@@ -192,7 +192,7 @@ def user_tweets(username):
             [get_user_id(username), PER_PAGE])
     response = [dict(x) for x in response]
     response = jsonify(response)
-    response.status_code = 200
+    response.error = 200
     return response
 
 
@@ -203,9 +203,9 @@ def add_message(username):
     if not headerUsername == username:
         print headerUsername
         print username
-        abort(401)
+        return jsonify(error=401), 401
     elif not get_user_id(headerUsername) == int(request.json['user_id']):
-        abort(401)
+        return jsonify(error=401), 401
     else:
         db = get_db()
         db.execute('''insert into message (author_id, text, pub_date)
@@ -214,5 +214,5 @@ def add_message(username):
         db.commit()
         url = url_for('timeline', username=username)
         response = jsonify(url)
-        response.status_code = 201
+        response.error = 201
         return response
