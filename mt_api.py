@@ -93,7 +93,9 @@ def get_user_id(username):
 def public_timeline():
     """Displays the latest messages of all users."""
     response = query_db('''
-        select message.*, user.* from message, user
+        select user.username, message.pub_date, message.text,
+        message.message_id
+        from message, user
         where message.author_id = user.user_id
         order by message.pub_date desc limit ?''', [PER_PAGE])
     response = [dict(x) for x in response]
@@ -165,7 +167,8 @@ def followers(username):
 def timeline(username):
     """Shows a users timeline."""
     response = query_db('''
-        select message.*, user.* from message, user
+        select user.username, message.message_id, message.pub_date, message.text
+        from message, user
         where message.author_id = user.user_id and (
             user.user_id = ? or
             user.user_id in (select whom_id from follower
@@ -186,8 +189,10 @@ def user_tweets(username):
     if profile_user is None:
         return jsonify(error=404), 404
     response =  query_db('''
-            select message.*, user.* from message, user where
-            user.user_id = message.author_id and user.user_id = ?
+            select user.username, message.message_id, message.pub_date,
+            message.text
+            from message, user
+            where user.user_id = message.author_id and user.user_id = ?
             order by message.pub_date desc limit ?''',
             [get_user_id(username), PER_PAGE])
     response = [dict(x) for x in response]

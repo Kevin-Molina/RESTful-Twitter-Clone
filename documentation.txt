@@ -1,7 +1,4 @@
 ---- Note -----
-Responses return sensitive data (this is bad), but the minitwit Responses
-look similar, so I left it as is. It would be as simple as specifying columns
-inside the select statements, so its not something I was unable to do.
 Output is truncated after the first json object*
 URL input is of the form <<ParamName:ValuePassed>>
 
@@ -22,13 +19,9 @@ GET - http://localhost:5000/tweets
 Output:
 [
   {
-    "author_id": 1,
-    "email": "Kevin@Gmail.com",
-    "message_id": 12,
-    "pub_date": 1519091777,
-    "pw_hash": "pbkdf2:sha256:50000$KIaF8vKf$a39aac6a850d5c4c95c840bfd3763f1c71a63e181869dbbd5d4e2d73cf2828fb",
-    "text": "dasdas",
-    "user_id": 1,
+    "message_id": 2,
+    "pub_date": 1519031320,
+    "text": "Kevin's 2nd post - fsdf",
     "username": "Kevin"
   },
   ...
@@ -39,15 +32,11 @@ GET - http://localhost:5000/tweets/<username:Kevin>
 Output:
 [
   {
-    "author_id": 1,
-    "email": "Kevin@Gmail.com",
-    "message_id": 12,
-    "pub_date": 1519091777,
-    "pw_hash": "pbkdf2:sha256:50000$KIaF8vKf$a39aac6a850d5c4c95c840bfd3763f1c71a63e181869dbbd5d4e2d73cf2828fb",
-    "text": "dasdas",
-    "user_id": 1,
+    "message_id": 2,
+    "pub_date": 1519031320,
+    "text": "Kevin's 2nd post - fsdf",
     "username": "Kevin"
-  },
+  }, 
   ...
 ]
 Response status: 200
@@ -62,13 +51,9 @@ Postman Basic Auth: (Done using their GUI)
 Output:
 [
   {
-    "author_id": 1,
-    "email": "Kevin@Gmail.com",
-    "message_id": 12,
-    "pub_date": 1519091777,
-    "pw_hash": "pbkdf2:sha256:50000$KIaF8vKf$a39aac6a850d5c4c95c840bfd3763f1c71a63e181869dbbd5d4e2d73cf2828fb",
-    "text": "dasdas",
-    "user_id": 1,
+    "message_id": 2,
+    "pub_date": 1519031320,
+    "text": "Kevin's 2nd post - fsdf",
     "username": "Kevin"
   },
   ...
