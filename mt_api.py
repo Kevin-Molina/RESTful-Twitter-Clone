@@ -21,7 +21,6 @@ class Subclass(BasicAuth):
 DATABASE = '/tmp/minitwit.db'
 PER_PAGE = 30
 DEBUG = True
-SECRET_KEY = b'_5#y2L"F4Q8z\n\xec]/'
 
 app = Flask('mt_api')
 app.config.from_object(__name__)
